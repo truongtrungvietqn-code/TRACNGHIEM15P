@@ -1,0 +1,5 @@
+{
+  "name": "AI Test Composer",
+  "description": "An intelligent web application to help teachers quickly compose 15-minute tests based on textbook, subject, grade, and topic selections.",
+  "requestFramePermissions": []
+}

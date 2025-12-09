@@ -1,0 +1,128 @@
+<div class="min-h-screen flex items-center justify-center p-4">
+  <main class="w-full max-w-4xl bg-white rounded-2xl shadow-xl p-8 space-y-8">
+    
+    <!-- Header Section -->
+    <header>
+      <h1 class="text-3xl font-bold text-slate-800 text-center">Soạn Đề Kiểm Tra 15 Phút</h1>
+      <p class="text-center text-slate-500 mt-2">Sử dụng AI để tạo câu hỏi nhanh chóng và hiệu quả</p>
+    </header>
+
+    <!-- Test Info Section -->
+    <section>
+      <h2 class="text-xl font-semibold text-slate-700 mb-4">Thông tin đề thi</h2>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <label for="sach" class="block text-sm font-medium text-slate-600 mb-1">Loại sách giáo khoa</label>
+          <select id="sach" (change)="onSachChange($event)" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            @for(option of sachOptions; track option) {
+              <option [value]="option" [selected]="option === sach()">{{ option }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label for="mon" class="block text-sm font-medium text-slate-600 mb-1">Tên môn</label>
+          <select id="mon" (change)="onMonChange($event)" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            @for(option of monOptions; track option) {
+              <option [value]="option" [selected]="option === mon()">{{ option }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label for="lop" class="block text-sm font-medium text-slate-600 mb-1">Tên lớp</label>
+          <select id="lop" (change)="onLopChange($event)" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+            @for(option of lopOptions; track option) {
+              <option [value]="option" [selected]="option === lop()">{{ option }}</option>
+            }
+          </select>
+        </div>
+        <div>
+          <label for="chu_de" class="block text-sm font-medium text-slate-600 mb-1">Tên chủ đề / bài học</label>
+          <input type="text" id="chu_de" (input)="onChuDeChange($event)" [value]="chuDe()" placeholder="VD: Quang hợp ở thực vật" class="w-full p-2 border border-slate-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500" />
+        </div>
+      </div>
+    </section>
+
+    <hr class="border-slate-200" />
+
+    <!-- Toolbar Section -->
+    <section>
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-slate-700">Nội dung câu hỏi</h2>
+        <div class="flex items-center gap-3">
+          <button (click)="generateQuestions()" [disabled]="isLoading() || !chuDe()" class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md shadow-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300 disabled:cursor-not-allowed transition-colors">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Tạo tự động
+          </button>
+          <button (click)="setQuestionTypeToAdd('MCQ')" [class.bg-indigo-100]="questionTypeToAdd() === 'MCQ'" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+            <i class="fa-solid fa-plus"></i> Trắc nghiệm
+          </button>
+          <button (click)="setQuestionTypeToAdd('TF')" [class.bg-indigo-100]="questionTypeToAdd() === 'TF'" class="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-md hover:bg-slate-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+            <i class="fa-solid fa-plus"></i> Đúng/Sai
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Question Composer & List Section -->
+    <section class="space-y-6">
+      @if (isLoading()) {
+        <div class="flex flex-col items-center justify-center text-center p-8 bg-slate-50 rounded-lg">
+          <i class="fa-solid fa-spinner fa-spin text-4xl text-indigo-500"></i>
+          <p class="mt-4 text-slate-600 font-medium">AI đang soạn câu hỏi, vui lòng chờ trong giây lát...</p>
+        </div>
+      }
+
+      @if (error()) {
+        <div class="p-4 bg-red-100 border border-red-400 text-red-700 rounded-md">
+          <p><i class="fa-solid fa-circle-exclamation mr-2"></i>{{ error() }}</p>
+        </div>
+      }
+      
+      @if (questionTypeToAdd()) {
+        <app-question-form 
+          [questionType]="questionTypeToAdd()!" 
+          (addQuestion)="addQuestion($event)" 
+          (cancel)="questionTypeToAdd.set(null)">
+        </app-question-form>
+      }
+
+      @if (questions().length > 0) {
+        <div class="space-y-4">
+          @for (question of questions(); track $index; let i = $index) {
+            <app-question-card [question]="question" [index]="i" (removeQuestion)="removeQuestion($event)"></app-question-card>
+          }
+        </div>
+      } @else if (!isLoading() && !error() && !questionTypeToAdd()) {
+        <div class="text-center py-12 border-2 border-dashed border-slate-300 rounded-lg">
+          <i class="fa-solid fa-file-lines text-5xl text-slate-400"></i>
+          <p class="mt-4 text-slate-500">Chưa có câu hỏi nào.</p>
+          <p class="text-sm text-slate-400">Hãy bắt đầu bằng cách điền chủ đề và nhấn "Tạo tự động".</p>
+        </div>
+      }
+    </section>
+
+    <!-- Export Section -->
+    @if (questions().length > 0) {
+      <hr class="border-slate-200" />
+      <section>
+          <h2 class="text-xl font-semibold text-slate-700">Hoàn tất & Xuất file</h2>
+          <p class="text-slate-500 mb-4 mt-1">Tải xuống đề thi và đáp án dưới dạng file văn bản (.txt).</p>
+          <div class="flex items-center gap-3">
+              <button (click)="exportTest()" class="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white font-semibold rounded-md shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors">
+                  <i class="fa-solid fa-file-arrow-down"></i>
+                  Xuất Đề thi
+              </button>
+              <button (click)="exportAnswers()" class="flex items-center gap-2 px-4 py-2 bg-slate-600 text-white font-semibold rounded-md shadow-md hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-colors">
+                  <i class="fa-solid fa-key"></i>
+                  Xuất Đáp án
+              </button>
+          </div>
+      </section>
+    }
+
+    <!-- Author Footer -->
+    <footer class="text-center text-sm text-slate-500 !mt-12 pt-6 border-t border-slate-200">
+      <p>Biên soạn: Trương Trung Việt - Trường THCS Nghĩa Hoa</p>
+    </footer>
+  </main>
+</div>

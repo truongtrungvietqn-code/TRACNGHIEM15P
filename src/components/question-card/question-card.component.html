@@ -1,0 +1,37 @@
+
+<div class="bg-slate-50 border border-slate-200 rounded-lg p-5 shadow-sm transition-shadow hover:shadow-md relative">
+  <div class="flex justify-between items-start">
+    <div class="pr-8">
+        <p class="font-semibold text-slate-800">
+            <span class="text-indigo-600">Câu {{ index() + 1 }}:</span> {{ question().question }}
+        </p>
+    </div>
+    <button (click)="onRemove()" title="Xóa câu hỏi" class="absolute top-3 right-3 text-slate-400 hover:text-red-500 transition-colors">
+        <i class="fas fa-times-circle"></i>
+    </button>
+  </div>
+  
+  <div class="mt-4 space-y-2">
+    @if (isMcq(question())) {
+      @for(option of question().options; track $index) {
+        <div 
+          class="flex items-center p-2 rounded-md"
+          [class.bg-green-100]="option === question().answer"
+          [class.text-green-800]="option === question().answer"
+          [class.font-bold]="option === question().answer">
+          <span class="font-mono mr-2 text-sm text-slate-500">{{ getOptionLetter($index) }}.</span>
+          <span>{{ option }}</span>
+        </div>
+      }
+    } @else {
+      <div class="flex gap-4">
+        <div class="flex items-center p-2 rounded-md" [class.bg-green-100]="'Đúng' === question().answer" [class.text-green-800]="'Đúng' === question().answer" [class.font-bold]="'Đúng' === question().answer">
+            <span>Đúng</span>
+        </div>
+        <div class="flex items-center p-2 rounded-md" [class.bg-green-100]="'Sai' === question().answer" [class.text-green-800]="'Sai' === question().answer" [class.font-bold]="'Sai' === question().answer">
+            <span>Sai</span>
+        </div>
+      </div>
+    }
+  </div>
+</div>
