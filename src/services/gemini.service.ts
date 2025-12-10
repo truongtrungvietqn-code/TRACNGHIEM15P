@@ -9,10 +9,10 @@ export class GeminiService {
   private ai: GoogleGenAI;
 
   constructor() {
-    if (!process.env.API_KEY) {
+    if (!process.env.GEMINIAPI_KEY) {
       throw new Error("API_KEY environment variable not set");
     }
-    this.ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    this.ai = new GoogleGenAI({ apiKey: process.env.GEMINIAPI_KEY });
   }
 
   async generateQuestions(sach: string, mon: string, lop: string, chuDe: string): Promise<Question[]> {
